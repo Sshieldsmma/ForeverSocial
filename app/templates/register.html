@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - ForeverSocial{% endblock %}  
+
+{% block content %}
+
+<div class="container">
+    <div class="box">
+        <h1>Welcome to Forever Social</h1>
+        <p>Forever Social is a social media platform that believes in forever. Here, every post is permanent, every
+            moment is captured, and every friendship is eternal. Unlike other platforms, we don't believe in
+            disappearing content, we believe in forever. Your thoughts, ideas, and memories live on, creating a digital
+            legacy that is unfiltered, unedited, and unapologetically you. Join us today and start creating your
+            forever.</p>
+    </div>
+    <div class="box">
+        <h2>Sign up now!</h2>
+        <form action="/register" method="post" onsubmit="return validatePasswords()">
+            <input type="email" name="email" placeholder="Email" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <input type="text" name="first_name" placeholder="First Name" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <input type="text" name="last_name" placeholder="Last Name" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <label for="date_of_birth" style="display: block; margin-bottom: 5px;">Date of Birth</label>
+            <input type="date" name="date_of_birth" placeholder="Date of Birth" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <input type="text" name="username" placeholder="Username" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <input type="password" name="password" placeholder="Password" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required style="width: 240px; display: block; margin-bottom: 10px;">
+            <p id="error-message" style="color: red; display: none;">Passwords do not match!</p>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <script>
+                setTimeout(() => {
+                    document.querySelector('.flashes').style.display = 'none';
+                }, 3000);
+            </script>
+            <input type="submit" value="Register">
+        </form>
+    <script>
+        function validatePasswords() {
+            var password = document.querySelector('input[name="password"]').value;
+            var confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+            if (password !== confirmPassword) {
+                document.getElementById('error-message').style.display = 'block';
+                return false;
+            }
+            return true;
+        }
+    </script>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+
+
+
+   

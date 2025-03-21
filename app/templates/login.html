@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - ForeverSocial{% endblock %}  
+
+{% block content %}
+<div class="text-center">
+    <h1>Welcome to Forever Social</h1>
+    <p>Connect, grow, learn, infinitely, for infinity.</p>
+
+</div>
+
+<div class="login-container">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        <input type="email" name="email" placeholder="Email" required style="width: 240px; display: block; margin-bottom: 10px;">
+        <input type="password" name="password" placeholder="Password" required style = "width: 240px; display: block; margin-bottom=10px;">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <script>
+            setTimeout(() => {
+                document.querySelector('.flashes').style.display = 'none';
+            }, 3000);
+        </script>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account yet? <a href="/register">Sign up now!</a></p>
+</div>
+{% endblock %}
+

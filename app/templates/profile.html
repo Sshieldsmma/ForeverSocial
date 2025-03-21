@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="profile-container">
+    <h1>{{ user.username }}'s Profile</h1>
+    <img src="{{ url_for('static', filename='images/profile_pics/' + user.profile_picture) }}?v={{user.id}}" alt="Profile Picture" class="profile-pic">
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Bio:</strong> {{ user.bio }}</p>
+    <p><strong>Date of Birth:</strong> {{ user.date_of_birth.strftime('%B %d, %Y') }}</p>
+    <p><strong>Age:</strong> {{ user.age() }}</p>
+    <a href="{{ url_for('users.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+</div>
+<h3>Friend Requests</h3>
+<ul>
+    {% for request in current_user.received_requests %}
+        {% if request.status == 'pending' %}
+            <li>
+                {{ request.sender.username }} wants to be your friend.
+                <form action="{{ url_for('users.accept_friend_request', request_id=request.id) }}" method="post">
+                    <button type="submit">Accept</button>
+                </form>
+                <form action="{{ url_for('users.decline_friend_request', request_id=request.id) }}" method="post">
+                    <button type="submit">Decline</button>
+                </form>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+
+{% if current_user.id != user.id %}
+    {% if user not in current_user.friends %}
+        {% set existing_request = user.received_requests | selectattr("sender_id", "equalto", current_user.id) | list %}
+        {% if existing_request and existing_request[0].status == 'pending' %}
+            <p>Friend request sent!</p>
+        {% else %}
+            <form action="{{ url_for('users.send_friend_request', receiver_id=user.id) }}" method="post">
+                <button type="submit">Send Friend Request</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p>You are friends with {{ user.username }}.</p>
+    {% endif %}
+{% endif %}
+
+
+{% if user in current_user.friends %}
+    <form action="{{ url_for('users.remove_friend', friend_id=user.id) }}" method="post">
+        <button type="submit">Remove Friend</button>
+    </form>
+{% endif %}
+<div class="posts-container">
+    <h2>{{ user.username }}'s Posts</h2>
+    {% for post in user.posts %}
+        <div class="post">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.content }}</p>
+            <p><small>Posted on {{ post.date_posted.strftime('%B %d, %Y') }}</small></p>
+        </div>
+    {% endfor %}
+</div>
+<button class="btn btn-secondary" onclick="toggleFriends()">Show Friends</button>
+<div id="friends-container" class="friends-container" style="display: none;">
+    <h3>{{ user.username }}'s friends</h3>
+    {% for friend in user.friends %}
+        <div class="friend">
+            <img src="{{ url_for('static', filename='profile_pics/' + friend.profile_pic) }}" alt="Profile Picture" class="profile-pic">
+            <p>{{ friend.username }}</p>
+        </div>
+    {% endfor %}
+</div> 
+
+<script>
+function toggleFriends() {
+    var friendsContainer = document.getElementById('friends-container');
+    if (friendsContainer.style.display === 'none') {
+        friendsContainer.style.display = 'block';
+    } else {
+        friendsContainer.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}
