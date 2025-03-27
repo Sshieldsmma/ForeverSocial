@@ -59,6 +59,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
 
     user = db.relationship('User', backref='posts', lazy=True) 
 
@@ -68,6 +69,10 @@ class FriendRequest(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, accepted, rejected
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_requests')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_requests')
+
 
     def __repr__(self):
         return f"<FriendRequest {self.sender_id} -> {self.receiver_id}, Status: {self.status}>"

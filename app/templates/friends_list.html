@@ -2,67 +2,20 @@
 {% block title %}Friends List{% endblock %}
 {% block content %}
     <h1>Friends List</h1>   
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        .search-bar {
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .friend-list {
-            list-style: none;
-            padding: 0;
-        }
-        .friend-list li {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .friend-list li img {
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        .friend-list li:last-child {
-            border-bottom: none;
-        }
-    </style>
-
+    <p>Search for friends:</p>
     <div class="container">
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Search friends...">
         </div>
         <ul class="friend-list" id="friendList">
-            <!-- Example friends -->
-            <li>
-                <img src="https://via.placeholder.com/50" alt="Friend 1">
-                <span>Friend 1</span>
-            </li>
-            <li>
-                <img src="https://via.placeholder.com/50" alt="Friend 2">
-                <span>Friend 2</span>
-            </li>
-            <li>
-                <img src="https://via.placeholder.com/50" alt="Friend 3">
-                <span>Friend 3</span>
-            </li>
+            {% for friend in friends %}
+                <li>
+                    <a href="{{ url_for('users.profile', user_id=friend.id) }}">
+                        <img src="{{ url_for('static', filename='images/profile_pics/' + friend.profile_picture) }}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
+                        <span>{{ friend.username }}</span>
+                    </a>
+                </li>
+            {% endfor %}
         </ul>
     </div>
 

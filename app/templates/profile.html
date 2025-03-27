@@ -2,12 +2,13 @@
 {% block content %}
 <div class="profile-container">
     <h1>{{ user.username }}'s Profile</h1>
-    <img src="{{ url_for('static', filename='images/profile_pics/' + user.profile_picture) }}?v={{user.id}}" alt="Profile Picture" class="profile-pic">
+    <img src="{{ url_for('static', filename='images/profile_pics/' + user.profile_picture) }}?v={{ user.id }}" alt="Profile Picture"
+     style="width: 150px; height: 150px; border-radius: 50%;" >
     <p><strong>Email:</strong> {{ user.email }}</p>
     <p><strong>Bio:</strong> {{ user.bio }}</p>
     <p><strong>Date of Birth:</strong> {{ user.date_of_birth.strftime('%B %d, %Y') }}</p>
     <p><strong>Age:</strong> {{ user.age() }}</p>
-    <a href="{{ url_for('users.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+    <a href="{{ url_for('users.edit_profile') }}" class="btn btn-secondary">Edit Profile</a>
 </div>
 <h3>Friend Requests</h3>
 <ul>
