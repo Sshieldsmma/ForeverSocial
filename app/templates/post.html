@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <h1> 
+        <a href="{{ url_for('users.profile', user_id=post.user.id) }}" style="color: rgb(2, 2, 32);">{{ post.user.username }}'s post</a> 
+    </h1>
+    <div class="post-container" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #f9f9f9;">
+    <p>{{ post.content }}</p>
+    <small>Posted on {{ post.date_posted.strftime('%m-%d-%Y %H:%M') }}</small>
+</div>
+{% endblock %}

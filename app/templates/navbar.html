@@ -5,30 +5,61 @@
             <img src="{{ url_for('static', filename='images/logo.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
         </a>
 
-        <!-- Navbar Toggler for Mobile View -->
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
+                {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.index') }}">Forever Social</a>
+                    <a class="nav-link" href="{{ url_for('users.profile', user_id=current_user.id) }}">
+                        Profile <img src="{{ url_for('static', filename='images/profile_pics/' + user.profile_picture) }}?v={{ user.id }}" alt="Profile Picture"
+                        style="width: 30px; height: 30px; border-radius: 50%;" >
+                    </a>
                 </li>
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('users.friends_list', user_id=current_user.id) }}">Friends</a>
                 </li>
                 {% endif %}
+
+                <form class="d-flex ms-auto" action="{{ url_for('main.search') }}" method="get">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Search user or posts" aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
             </ul>
 
-            <!-- Right Side of Navbar -->
+            
             <ul class="navbar-nav">
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('users.profile', user_id=current_user.id) }}">
-                        Profile <img src="{{ current_user.profile_picture }}" class="rounded-circle" width="30">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Notifications <span class="badge bg-danger">{{ pending_requests|length }}</span>
                     </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if pending_requests %}
+                            {% for request in pending_requests %}
+                                <span style="color: black;"></span>
+                                    <a href="{{ url_for('users.profile', user_id=request.sender.id) }}">
+                                        {{ request.sender.username }} sent you a friend request
+                                    </a>
+                                </span> <a href="{{ url_for('users.profile', user_id=request.sender.id) }}"></a>
+                                        {{ request.sender.username }} sent you a friend request
+                                    </a>
+                                    <form action="{{ url_for('users.accept_friend_request', request_id=request.id) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                    </form>
+                                    <form action="{{ url_for('users.decline_friend_request', request_id=request.id) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                    </form>
+                                </li>
+                                <hr>
+                            {% endfor %}
+                        {% else %}
+                            <li class="dropdown-item">No new friend requests</li>
+                        {% endif %}
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>

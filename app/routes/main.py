@@ -3,6 +3,7 @@ from app.models import Post
 from app import db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta, timezone
+from ..models import User, Post, FriendRequest
 
 main = Blueprint('main', __name__)
 
@@ -23,7 +24,7 @@ def create_post():
         if not  content:
             flash('Content required!')
         else:
-            new_post = Post(content=content, user=current_user, date_posted=datetime.now(timezone.utc))                
+            new_post = Post(id=Post.query.count() + 1, content=content, user=current_user, date_posted=datetime.now(timezone.utc))
             db.session.add(new_post)
             db.session.commit()
             flash('Post created successfully!')
@@ -31,4 +32,36 @@ def create_post():
 
     return redirect(url_for('main.index'))
 
+@main.route('/post/<int:post_id>')
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', post=post, user=current_user)
+
+
+@main.context_processor
+def inject_notifications():
+    if current_user.is_authenticated:
+        pending_requests = FriendRequest.query.filter_by(receiver_id=current_user.id, status='pending').all()
+    else:
+        pending_requests = []
+    return dict(pending_requests=pending_requests)
+
+
+@main.route('/search')
+def search():
+    query = request.args.get('query')
+
+    if not query:
+        return render_template('search_results.html', posts=[], users=[])
+    
+    users = User.query.filter(
+        (User.first_name.ilike(f'%{query}%')) |
+        (User.last_name.ilike(f'%{query}%')) |
+        (User.username.ilike(f'%{query}%'))
+    ).all()
+
+    posts = Post.query.filter(Post.content.ilike(f"%{query}%")).all()
+
+
+    return render_template('search_results.html', posts=posts, users=users, query=query, user=current_user)
 

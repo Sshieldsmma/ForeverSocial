@@ -8,16 +8,17 @@ import os
  
 users = Blueprint('users', __name__)
 
-UPLOAD_FOLDER = 'static/images/profile_pics'
+UPLOAD_FOLDER = 'app/static/images/profile_pics'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@users.route('/profile')
+@users.route('/profile/<int:user_id>')
 @login_required
-def profile():
-    return render_template('profile.html', user=current_user)
+def profile(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template('profile.html', user=user)
 
 @users.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
@@ -39,17 +40,18 @@ def edit_profile():
                 filename = f"{current_user.id}_{secure_filename(file.filename)}"
                 file_path = os.path.join(UPLOAD_FOLDER, filename)
                 file.save(file_path)
-                User.profile_picture = filename
                 
-                
+
                 if current_user.profile_picture:
                     old_file_path = os.path.join(UPLOAD_FOLDER, current_user.profile_picture)
                     if os.path.exists(old_file_path):
                         os.remove(old_file_path)
+                                
+                current_user.profile_picture = filename
 
-        db.session.commit()
+        db.session.commit()     
         flash('Profile updated successfully!')
-        return redirect(url_for('users.profile'))
+        return redirect(url_for('users.profile', user=current_user))
 
     return render_template('edit_profile.html', user=current_user)
 
