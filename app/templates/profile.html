@@ -8,8 +8,11 @@
     <p><strong>Bio:</strong> {{ user.bio }}</p>
     <p><strong>Date of Birth:</strong> {{ user.date_of_birth.strftime('%B %d, %Y') }}</p>
     <p><strong>Age:</strong> {{ user.age() }}</p>
+    {% if current_user.id == user.id %}
     <a href="{{ url_for('users.edit_profile') }}" class="btn btn-secondary">Edit Profile</a>
+    {% endif %}
 </div>
+{% if current_user.id == user.id %}
 <h3>Friend Requests</h3>
 <ul>
     {% for request in current_user.received_requests %}
@@ -26,7 +29,7 @@
         {% endif %}
     {% endfor %}
 </ul>
-
+{% endif %}
 
 {% if current_user.id != user.id %}
     {% if user not in current_user.friends %}
@@ -64,8 +67,10 @@
     <h3>{{ user.username }}'s friends</h3>
     {% for friend in user.friends %}
         <div class="friend">
-            <img src="{{ url_for('static', filename='profile_pics/' + friend.profile_pic) }}" alt="Profile Picture" class="profile-pic">
-            <p>{{ friend.username }}</p>
+            <a href="{{ url_for('users.profile', user_id=friend.id) }}">
+                <img src="{{ url_for('static', filename='images/profile_pics/' + friend.profile_picture) }}" alt="{{ friend.username }}'s Profile Picture" class="profile-pic">
+                <p>{{ friend.username }}</p>
+            </a>
         </div>
     {% endfor %}
 </div> 

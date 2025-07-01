@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class=""reels-feed">
+    <form action="{{ url_for('reels.upload_reel') }}" method="post" enctype="multipart/form-data">
+    <input type="text" name="user_id" value="{{ current_user.id }}" hidden>
+    <input type="text" name="caption" placeholder="Write a caption..." class="form-control mb-2">
+    <input type="file" name="video" accept="video/*" class="form-control mb-2">
+    <button type="submit" class="btn btn-primary">Upload Reel</button>
+</form>
+    {% for reel in reels %}
+  <div class="reel mb-4">
+    <video controls style="width: 100%; max-height: 400px;">
+      <source src="{{ reel.video_url }}" type="video/mp4">
+    </video>
+    <div>
+      <p><strong>Caption:</strong> {{ reel.caption }}</p>
+      <form action="{{ url_for('reels.like_reel', reel_id=reel.id) }}" method="post" style="display:inline;">
+          <button class="btn btn-sm btn-outline-danger">❤️ {{ reel.likes }}</button>
+      </form>
+      <form action="{{ url_for('reels.comment_reel', reel_id=reel.id) }}" method="post" style="display:inline;">
+          <input type="text" name="comment" placeholder="Add comment" class="form-control d-inline w-50">
+          <button class="btn btn-sm btn-outline-secondary">Comment</button>
+      </form>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

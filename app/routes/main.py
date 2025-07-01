@@ -4,8 +4,9 @@ from app import db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta, timezone
 from ..models import User, Post, FriendRequest
-
 main = Blueprint('main', __name__)
+
+
 
 @main.route('/')
 def index():
@@ -36,6 +37,32 @@ def create_post():
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     return render_template('post.html', post=post, user=current_user)
+
+''' @main.route('/like/<int:post_id>', methods=['POST'])
+def like_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    post.likes += 1
+    db.session.commit()
+    return redirect(url_for('post.get_posts')) '''
+
+@main.route('/like/<int:post_id>', methods=['POST'])
+@login_required
+def like_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    post.likes += 1
+    db.session.commit()
+    return redirect(url_for('posts.view_post', post_id=post_id))
+
+@main.route('/comment/<int:post_id>', methods=['POST'])
+def comment_post(post_id):
+    comment = request.form.get('comment')
+    post = Post.query.get_or_404(post_id)
+    if post.comments:
+        post.comments += f'\n{comment}'
+    else:
+        post.comments = comment
+    db.session.commit()
+    return redirect(url_for('post.get_post'))
 
 
 @main.context_processor
