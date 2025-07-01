@@ -15,7 +15,7 @@
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('users.profile', user_id=current_user.id) }}">
-                        Profile <img src="{{ url_for('static', filename='images/profile_pics/' + user.profile_picture) }}?v={{ user.id }}" alt="Profile Picture"
+                        Profile <img src="{{ url_for('static', filename='images/profile_pics/' + current_user.profile_picture) }}?v={{ current_user.id }}" alt="Profile Picture"
                         style="width: 30px; height: 30px; border-radius: 50%;" >
                     </a>
                 </li>
@@ -24,6 +24,10 @@
                     <a class="nav-link" href="{{ url_for('users.friends_list', user_id=current_user.id) }}">Friends</a>
                 </li>
                 {% endif %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('reels.get_reels') }}">Reels</a>
+                </li>
 
                 <form class="d-flex ms-auto" action="{{ url_for('main.search') }}" method="get">
                     <input class="form-control me-2" type="search" name="query" placeholder="Search user or posts" aria-label="Search">

@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 
@@ -59,6 +59,9 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    likes = db.Column(db.Integer, default=0)
+    comments = db.Column(db.Text, nullable=True)  
+    views = db.Column(db.Integer, default=0)  
     
 
     user = db.relationship('User', backref='posts', lazy=True) 
@@ -67,7 +70,7 @@ class FriendRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, accepted, rejected
+    status = db.Column(db.String(20), default='pending')  
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_requests')
@@ -78,6 +81,24 @@ class FriendRequest(db.Model):
         return f"<FriendRequest {self.sender_id} -> {self.receiver_id}, Status: {self.status}>"
 
 
+class Reel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    caption = db.Column(db.String(255), nullable=True)
+    video_url = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    views = db.Column(db.Integer, default=0)
+    likes = db.Column(db.Integer, default=0)
+    comments = db.Column(db.Text, nullable=True)
+    thumbnail_art = db.Column(db.String(255), nullable=True)  # URL to the thumbnail image
+    audio_url = db.Column(db.String(255), nullable=True)  # URL to the audio file
+    tags = db.Column(db.String(255), nullable=True)  
+    duration = db.Column(db.Integer, nullable=True)  
+
+    user = db.relationship('User', backref='reels', lazy=True)
+
+    def __repr__(self):
+        return f"<Reel {self.id}, User: {self.user_id}, Caption: {self.caption}>"
 
 
 from app import login_manager  

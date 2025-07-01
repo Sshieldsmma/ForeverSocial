@@ -15,7 +15,7 @@ bcrypt =  Bcrypt()
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "info"
-migrate = Migrate()
+migrate = Migrate(db)
 
 def create_app():
     app = Flask(__name__)   
