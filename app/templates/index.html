@@ -37,15 +37,26 @@ function toggleForm() {
         </div>
     </div>
     <div class="posts" id="posts">
-        {% for post in posts %}
-            <div class="post-container" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #f9f9f9;">
-                <div class="post">
+    {% for post in posts %}
+        <div class="post-container" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #f9f9f9;">
+            <div class="post">
+                <a href="{{ url_for('main.post', post_id=post.id) }}" style="text-decoration: none; color: inherit;">
                     <p>{{ post.content }}</p>
                     <small>Posted by {{ post.user.username }} on {{ post.date_posted.strftime('%m-%d-%Y %H:%M') }}</small>
-                </div>
+                </a>
+                <form action="{{ url_for('main.like_post', post_id=post.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Like ({{ post.likes }})</button>
+                </form>
+                <form action="{{ url_for('main.comment_post', post_id=post.id) }}" method="post">
+                    <input type="text" name="comment" placeholder="Write a comment..." class="form-control form-control-sm" />
+                    <button type="submit" class="btn btn-sm btn-outline-secondary mt-1">Comment</button>
+                </form>
+                {% for comment in post.comments or [] %}
+                    <li><strong>{{ comment.user.username }}:</strong> {{ comment.content }}</li>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
 </div>
 
 

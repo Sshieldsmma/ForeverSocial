@@ -15,14 +15,15 @@
 
     <!-- Like and Comment Buttons -->
     <div class="mb-3">
-        <form action="{{ url_for('posts.like_post', post_id=post.id) }}" method="post" style="display: inline;">
+        <form action="{{ url_for('main.like_post', post_id=post.id) }}" method="post" style="display: inline;">
             <button type="submit" class="btn btn-outline-primary btn-sm">❤️ Like ({{ likes_count }})</button>
+            <span>{{ post.likes }} Likes</span>
         </form>
     </div>
 
     <!-- Comment Form -->
     <h4>Add a Comment</h4>
-    <form action="{{ url_for('posts.comment_post', post_id=post.id) }}" method="post">
+    <form action="{{ url_for('main.comment_post', post_id=post.id) }}" method="post">
         <div class="mb-3">
             <textarea name="comment_content" class="form-control" rows="2" placeholder="Write your comment..." required></textarea>
         </div>

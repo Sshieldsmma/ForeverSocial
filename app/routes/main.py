@@ -3,7 +3,7 @@ from app.models import Post
 from app import db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta, timezone
-from ..models import User, Post, FriendRequest
+from ..models import User, Post, FriendRequest, Comment
 main = Blueprint('main', __name__)
 
 
@@ -45,24 +45,25 @@ def like_post(post_id):
     db.session.commit()
     return redirect(url_for('post.get_posts')) '''
 
-@main.route('/like/<int:post_id>', methods=['POST'])
+@main.route('/post/<int:post_id>/like', methods=['POST'])
 @login_required
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
+    post.likes = post.likes or 0
     post.likes += 1
     db.session.commit()
-    return redirect(url_for('posts.view_post', post_id=post_id))
+    return redirect(request.referrer or url_for('main.index'))
 
-@main.route('/comment/<int:post_id>', methods=['POST'])
+@main.route('/post/<int:post_id>/comment', methods=['POST'])
+@login_required
 def comment_post(post_id):
-    comment = request.form.get('comment')
     post = Post.query.get_or_404(post_id)
-    if post.comments:
-        post.comments += f'\n{comment}'
-    else:
-        post.comments = comment
-    db.session.commit()
-    return redirect(url_for('post.get_post'))
+    content = request.form.get('comment')
+    if content:
+        comment = Comment(content=content, user_id=current_user.id, post_id=post.id)
+        db.session.add(comment)
+        db.session.commit()
+    return redirect(request.referrer or url_for('main.index'))
 
 
 @main.context_processor
