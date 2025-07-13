@@ -59,12 +59,22 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    likes = db.Column(db.Integer, default=0)
+    likes = db.Column(db.Integer, default=0, nullable=False)
     comments = db.Column(db.Text, nullable=True)  
     views = db.Column(db.Integer, default=0)  
     
-
+    comments = db.relationship('Comment', backref='post', lazy=True)
     user = db.relationship('User', backref='posts', lazy=True) 
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+
+    user = db.relationship('User', backref='comments')
+
 
 class FriendRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
