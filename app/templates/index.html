@@ -38,7 +38,7 @@ function toggleForm() {
     </div>
     <div class="posts" id="posts">
     {% for post in posts %}
-        <div class="post-container" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #f9f9f9;">
+        <div class="post-container">
             <div class="post">
                 <a href="{{ url_for('main.post', post_id=post.id) }}" style="text-decoration: none; color: inherit;">
                     <p>{{ post.content }}</p>
@@ -58,6 +58,25 @@ function toggleForm() {
         </div>
     {% endfor %}
 </div>
+<script>
+document.querySelectorAll('.like-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const postId = form.getAttribute('data-post-id');
+
+        fetch(`/like_post/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            form.querySelector('.like-count').textContent = `${data.likes} Likes`;
+        });
+    });
+});
+</script>
 
 
 
