@@ -33,5 +33,6 @@ migrations/*
 migrations/versions/*
 
 
-
+app.instance
+app.instance.*
    
