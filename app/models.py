@@ -60,7 +60,8 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     likes = db.Column(db.Integer, default=0, nullable=False)
-    comments = db.Column(db.Text, nullable=True)  
+    comments_count = db.Column(db.Integer, default=0, nullable=False)
+    likes_count = db.Column(db.Integer, default=0, nullable=False)
     views = db.Column(db.Integer, default=0)  
     
     comments = db.relationship('Comment', backref='post', lazy=True)
@@ -74,6 +75,7 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
     user = db.relationship('User', backref='comments')
+    
 
 
 class FriendRequest(db.Model):
@@ -83,8 +85,8 @@ class FriendRequest(db.Model):
     status = db.Column(db.String(20), default='pending')  
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_requests')
-    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_requests')
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_requests', remote_side='User.id')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_requests', remote_side='User.id')
 
 
     def __repr__(self):
