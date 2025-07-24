@@ -18,7 +18,7 @@ def allowed_file(filename):
 @login_required
 def profile(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template('profile.html', user=user)
+    return redirect(url_for('users.profile', user_id=current_user.id))
 
 @users.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
