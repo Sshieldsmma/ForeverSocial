@@ -3,16 +3,16 @@ from werkzeug.utils import secure_filename
 import boto3, uuid
 from app.models import db, Reel
 from datetime import datetime, timezone
+from dotenv import load_dotenv
 
+BUCKET_NAME = 'foreversocial-media-uploads'  # S3 bucket name
 reels = Blueprint('reels', __name__)
 s3 = boto3.client('s3')
-BUCKET_NAME = 'foreversocial-media-uploads'  # S3 bucket name
-
 @reels.route('/reels/upload', methods=['POST'])
 def upload_reel():
     user_id = request.form.get('user_id')
     caption = request.form.get('caption', '')
-    video = request.files['video']
+    video = request.files.get('video')
 
     if not video:
         return jsonify({"error": "No video file provided"}), 400
@@ -38,6 +38,8 @@ def upload_reel():
     db.session.commit()
 
     return jsonify({"message": "Reel uploaded successfully", "video_url": video_url}), 201
+
+
 
 
 @reels.route('/reels', methods=['GET'])
