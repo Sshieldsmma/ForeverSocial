@@ -1,30 +1,130 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class=""reels-feed">
-    <form action="{{ url_for('reels.upload_reel') }}" method="post" enctype="multipart/form-data">
-    <input type="text" name="user_id" value="{{ current_user.id }}" hidden>
-    {% if request.files.get('video') %}
-      <input type="text" name="caption" placeholder="Write a caption..." class="form-control mb-2">
-    {% endif %}
-    <input type="file" name="video" accept="video/*" class="form-control mb-2">
-    <button type="submit" class="btn btn-primary">Upload Reel</button>
-</form>
+<div class="container mt-4 reels-feed">
+
+  
+  <form id="reelUploadForm" enctype="multipart/form-data">
+    <input type="hidden" name="user_id" value="{{ current_user.id }}">
+
+    <div class="mb-2">
+      <button type="button" class="btn btn-outline-primary w-100" onclick="document.getElementById('videoInput').click();">
+        🎥 Upload a Reel
+      </button>
+      <input type="file" id="videoInput" name="video" accept="video/*" class="d-none">
+      <div id="fileName" class="form-text mt-1 text-center">No file chosen</div>
+    </div>
+
+    <div id="captionInput" class="mb-2 d-none">
+      <input type="text" id="captionField" name="caption" placeholder="Write a caption..." class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 mt-2" id="postButton" disabled>⬆️ Post it Forever</button>
+  </form>
+
+  <hr class="my-4">
+
+  
+  <div id="reelsFeedContainer">
     {% for reel in reels %}
-  <div class="reel mb-4">
-    <video controls style="width: 100%; max-height: 400px;">
-      <source src="{{ reel.video_url }}" type="video/mp4">
-    </video>
-    <div>
-      <p><strong>Caption:</strong> {{ reel.caption }}</p>
-      <form action="{{ url_for('reels.like_reel', reel_id=reel.id) }}" method="post" style="display:inline;">
-          <button class="btn btn-sm btn-outline-danger">❤️ {{ reel.likes }}</button>
+    <div class="reel mb-4">
+      <video controls class="w-100 mb-2" style="max-height: 400px;">
+        <source src="{{ reel.video_url }}" type="video/mp4">
+      </video>
+      <p><strong></strong> {{ reel.caption }}</p>
+
+      
+      <form action="{{ url_for('reels.like_reel', reel_id=reel.id) }}" method="post" class="d-inline">
+        <button class="btn btn-sm btn-outline-danger">❤️ {{ reel.likes }}</button>
       </form>
-      <form action="{{ url_for('reels.comment_reel', reel_id=reel.id) }}" method="post" style="display:inline;">
-          <input type="text" name="comment" placeholder="Add comment" class="form-control d-inline w-50">
-          <button class="btn btn-sm btn-outline-secondary">Comment</button>
+
+      
+      <form action="{{ url_for('reels.comment_reel', reel_id=reel.id) }}" method="post" class="d-inline w-100 mt-2">
+        <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.classList.toggle('d-none'); this.classList.add('d-none');">+ Comment</button>
+            <input type="text" name="comment" placeholder="Add comment" class="form-control d-none" oninput="this.nextElementSibling.disabled = !this.value.trim();">
+            <button class="btn btn-outline-secondary d-none" type="submit" disabled>Comment</button>
+          <button class="btn btn-outline-secondary" type="submit">Comment</button>
+        </div>
       </form>
     </div>
+    {% endfor %}
   </div>
-{% endfor %}
-</div>
+
+<script>
+  const videoInput = document.getElementById('videoInput');
+  const captionInput = document.getElementById('captionInput');
+  const fileNameDisplay = document.getElementById('fileName');
+  const postButton = document.getElementById('postButton');
+  const form = document.getElementById('reelUploadForm');
+  const reelsFeedContainer = document.getElementById('reelsFeedContainer');
+
+  videoInput.addEventListener('change', function () {
+    const file = videoInput.files[0];
+    fileNameDisplay.textContent = file ? file.name : 'No file chosen';
+    captionInput.classList.toggle('d-none', !file);
+    postButton.disabled = !file;
+  });
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('user_id', form.user_id.value);
+    formData.append('caption', document.getElementById('captionField').value);
+    formData.append('video', videoInput.files[0]);
+
+    try {
+      const response = await fetch("{{ url_for('reels.upload_reel') }}", {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        
+        const newReelHTML = `
+          <div class="reel mb-4">
+            <video controls class="w-100 mb-2" style="max-height: 400px;">
+              <source src="${data.video_url}" type="video/mp4">
+            </video>
+            <p><strong>Caption:</strong> ${data.caption}</p>
+
+            <form action="/reels/like/${data.reel_id}" method="post" class="d-inline">
+              <button class="btn btn-sm btn-outline-danger">❤️ 0</button>
+            </form>
+
+            <form action="/reels/comment/${data.reel_id}" method="post" class="d-inline w-100 mt-2">
+              <div class="input-group">
+                <input type="text" name="comment" placeholder="Add comment" class="form-control">
+                <button class="btn btn-outline-secondary" type="submit">Comment</button>
+              </div>
+            </form>
+          </div>
+        `;
+
+        
+        reelsFeedContainer.insertAdjacentHTML('afterbegin', newReelHTML);
+
+        // Reset form
+        form.reset();
+        fileNameDisplay.textContent = 'No file chosen';
+        captionInput.classList.add('d-none');
+        postButton.disabled = true;
+
+      } else if (response.redirected) {
+        
+        window.location.href = response.url;
+      } else {
+        const data = await response.json();
+        alert(data.message || "Upload failed");
+      }
+    } catch (err) {
+      alert("Upload failed.");
+      console.error(err);
+    }
+  });
+</script>
+
 {% endblock %}
+
