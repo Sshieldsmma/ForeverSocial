@@ -3,11 +3,31 @@ from werkzeug.utils import secure_filename
 import boto3, uuid
 from app.models import db, Reel
 from datetime import datetime, timezone
+import os
 from dotenv import load_dotenv
+
+env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '.env'))
+print("[DEBUG] Loading .env from:", env_path)
+load_dotenv(dotenv_path=env_path)
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+print(f"[DEBUG] AWS Access Key: {AWS_ACCESS_KEY_ID}")
+print(f"[DEBUG] AWS Secret Key: {AWS_SECRET_ACCESS_KEY[:4]}***")
 
 BUCKET_NAME = 'foreversocial-media-uploads'  # S3 bucket name
 reels = Blueprint('reels', __name__)
-s3 = boto3.client('s3')
+
+
+s3 = boto3.client(
+    's3',
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+)
+
+
+
 @reels.route('/reels/upload', methods=['POST'])
 def upload_reel():
     user_id = request.form.get('user_id')
