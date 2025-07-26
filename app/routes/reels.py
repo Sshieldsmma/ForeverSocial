@@ -13,8 +13,7 @@ load_dotenv(dotenv_path=env_path)
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
-print(f"[DEBUG] AWS Access Key: {AWS_ACCESS_KEY_ID}")
-print(f"[DEBUG] AWS Secret Key: {AWS_SECRET_ACCESS_KEY[:4]}***")
+
 
 BUCKET_NAME = 'foreversocial-media-uploads'  # S3 bucket name
 reels = Blueprint('reels', __name__)
@@ -37,12 +36,11 @@ def upload_reel():
     if not video:
         return jsonify({"error": "No video file provided"}), 400
 
-
     filename = secure_filename(video.filename)
     file_extension = filename.rsplit('.', 1)[-1]
     unique_filename = f"reels{uuid.uuid4()}.{file_extension}"
 
-    s3.upload_fileobj(video, 'foreversocial-media-uploads', unique_filename, ExtraArgs={"ContentType": video.content_type})
+    s3.upload_fileobj(video, BUCKET_NAME, unique_filename, ExtraArgs={"ContentType": video.content_type})
     video_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
 
     new_reel = Reel(
@@ -57,7 +55,14 @@ def upload_reel():
     db.session.add(new_reel)
     db.session.commit()
 
-    return jsonify({"message": "Reel uploaded successfully", "video_url": video_url}), 201
+    
+    return jsonify({
+    "message": "Reel uploaded successfully",
+    "video_url": video_url,
+    "caption": caption,
+    "reel_id": new_reel.id
+    }), 201
+
 
 
 
