@@ -15,7 +15,7 @@
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('users.profile', user_id=current_user.id) }}">
-                        Profile <img src="{{ url_for('static', filename='images/profile_pics/' + current_user.profile_picture) }}?v={{ current_user.id }}" alt="Profile Picture"
+                        Profile <img src="{{ url_for('static', filename='images/profile_pics/' + current_user.profile_picture) }}?v={{ current_user.id }}" alt=""
                         style="width: 30px; height: 30px; border-radius: 50%;" >
                     </a>
                 </li>

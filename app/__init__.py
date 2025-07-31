@@ -4,12 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
 from app.config import config_options, Config
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
+socketio = SocketIO(cors_allowed_origins="*")  # Initialize SocketIO with CORS support
 db = SQLAlchemy()
 bcrypt =  Bcrypt()
 login_manager = LoginManager()
@@ -23,6 +25,7 @@ def create_app():
     app.config.from_object(config_options[os.getenv('FLASK_ENV', 'development')])
 
     db.init_app(app)
+    socketio.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db) 
