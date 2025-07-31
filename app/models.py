@@ -111,6 +111,39 @@ class Reel(db.Model):
 
     def __repr__(self):
         return f"<Reel {self.id}, User: {self.user_id}, Caption: {self.caption}>"
+    
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+
+    def __repr__(self):
+        return f"<Message {self.id} from {self.sender_id} to {self.receiver_id}>"
+
+
+
+class AirMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    conversation_id = db.Column(db.Integer, db.ForeignKey('conversation.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='air_sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='air_received_messages')
+
+    def __repr__(self):
+        return f"<AirMessage {self.id} from {self.sender_id} to {self.receiver_id}>"
+
+
 
 
 from app import login_manager  
